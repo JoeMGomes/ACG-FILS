@@ -2,4 +2,17 @@
 #include <glew.h>
 #include <glfw3.h>
 
-GLuint loadBMP(const char * imagepath);
+enum {
+	RIGHT,
+	LEFT,
+	TOP,
+	BOTTOM,
+	FRONT,
+	BACK
+};
+
+GLuint loadBMP(const char* imagepath );
+
+GLuint loadSkybox(const char* imagePaths[]);
+
+int loadSkyboxSide(GLuint* skyTexture, const char* imagepath, int side);

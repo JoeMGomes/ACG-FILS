@@ -1,7 +1,7 @@
 #include "texture.h"
 #include <iostream>
 
-GLuint loadBMP(const char * imagepath) {
+GLuint loadBMP(const char* imagepath) {
 
 	printf("Reading image %s\n", imagepath);
 
@@ -10,9 +10,9 @@ GLuint loadBMP(const char * imagepath) {
 	unsigned int imageSize;
 	unsigned int width, height;
 
-	unsigned char * data;
+	unsigned char* data;
 
-	FILE * file;
+	FILE* file;
 	errno_t err = fopen_s(&file, imagepath, "rb");
 	if (err)
 	{
@@ -38,10 +38,10 @@ GLuint loadBMP(const char * imagepath) {
 	width = *(int*)&(header[0x12]);
 	height = *(int*)&(header[0x16]);
 
-	if (imageSize == 0)    imageSize = width*height * 3; 
-	if (dataPos == 0)      dataPos = 54; 
+	if (imageSize == 0)    imageSize = width * height * 3;
+	if (dataPos == 0)      dataPos = 54;
 
-										
+
 	data = new unsigned char[imageSize];
 
 	// Read data into buffer
@@ -67,4 +67,81 @@ GLuint loadBMP(const char * imagepath) {
 
 	// Return the ID of the texture
 	return textureID;
+}
+
+GLuint loadSkybox(const char* imagePaths[]) {
+
+	GLuint textureID;
+
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	// These are very important to prevent seams
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	for (size_t i = 0; i < 6; i++) {
+		int res = loadSkyboxSide(&textureID , imagePaths[i], i);
+		if (res == 0) {
+			printf("Fatal error");
+		}
+	}
+	return textureID;
+}
+
+
+int loadSkyboxSide(GLuint *skyTexture, const char* imagepath, int side) {
+
+	printf("Reading image %s\n", imagepath);
+
+	unsigned char header[54];
+	unsigned int dataPos;
+	unsigned int imageSize;
+	unsigned int width, height;
+
+	unsigned char* data;
+
+	FILE* file;
+	errno_t err = fopen_s(&file, imagepath, "rb");
+	if (err)
+	{
+		printf("%s could not be opened.", imagepath); getchar(); return 0;
+	}
+
+	if (fread(header, 1, 54, file) != 54) {
+		printf("Not a correct BMP file\n");
+		return 0;
+	}
+
+	// Parsing BMP file
+	if (header[0] != 'B' || header[1] != 'M') {
+		printf("Not a correct BMP file\n");
+		return 0;
+	}
+
+	if (*(int*)&(header[0x1E]) != 0) { printf("Not a correct BMP file\n");    return 0; }
+	if (*(int*)&(header[0x1C]) != 24) { printf("Not a correct BMP file\n");    return 0; }
+
+	dataPos = *(int*)&(header[0x0A]);
+	imageSize = *(int*)&(header[0x22]);
+	width = *(int*)&(header[0x12]);
+	height = *(int*)&(header[0x16]);
+
+	if (imageSize == 0)    imageSize = width * height * 3;
+	if (dataPos == 0)      dataPos = 54;
+
+
+	data = new unsigned char[imageSize];
+
+	// Read data into buffer
+	fread(data, 1, imageSize, file);
+
+	fclose(file);
+
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + side, 0, GL_RGB,	width, height,0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	delete[] data;
+	 
+	return 1;
 }

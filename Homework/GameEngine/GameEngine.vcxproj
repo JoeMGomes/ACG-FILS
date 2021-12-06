@@ -125,6 +125,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Model Loading\meshLoaderObj.cpp" />
     <ClCompile Include="Model Loading\mesh.cpp" />
+    <ClCompile Include="Model Loading\skybox.cpp" />
     <ClCompile Include="Shaders\shader.cpp" />
     <ClCompile Include="Model Loading\texture.cpp" />
   </ItemGroup>
@@ -133,12 +134,15 @@
     <ClInclude Include="Graphics\window.h" />
     <ClInclude Include="Model Loading\meshLoaderObj.h" />
     <ClInclude Include="Model Loading\mesh.h" />
+    <ClInclude Include="Model Loading\skybox.h" />
     <ClInclude Include="Model Loading\stringTokenizer.h" />
     <ClInclude Include="Shaders\shader.h" />
     <ClInclude Include="Model Loading\texture.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\fragment_shader.glsl" />
+    <None Include="Shaders\skybox_frag.glsl" />
+    <None Include="Shaders\skybox_vert.glsl" />
     <None Include="Shaders\sun_fragment_shader.glsl" />
     <None Include="Shaders\sun_vertex_shader.glsl" />
     <None Include="Shaders\vertex_shader.glsl" />

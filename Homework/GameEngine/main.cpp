@@ -4,6 +4,7 @@
 #include "Model Loading\mesh.h"
 #include "Model Loading\texture.h"
 #include "Model Loading\meshLoaderObj.h"
+#include "Model Loading\skybox.h"
 
 void processKeyboardInput ();
 
@@ -23,6 +24,10 @@ int main()
 	//building and compiling shader program
 	Shader shader("Shaders/vertex_shader.glsl", "Shaders/fragment_shader.glsl");
 	Shader sunShader("Shaders/sun_vertex_shader.glsl", "Shaders/sun_fragment_shader.glsl");
+	Shader skyboxShader("Shaders/skybox_vert.glsl", "Shaders/skybox_frag.glsl");
+
+	skyboxShader.use();
+	glUniform1i(glGetUniformLocation(skyboxShader.getId(), "skyTexture"), 0);
 
 	//Textures
 	GLuint tex = loadBMP("Resources/Textures/wood.bmp");
@@ -81,6 +86,31 @@ int main()
 	Mesh sun = loader.loadObj("Resources/Models/sphere.obj");
 	Mesh box = loader.loadObj("Resources/Models/cube.obj", textures);
 	Mesh plane = loader.loadObj("Resources/Models/plane.obj", textures3);
+	
+
+	//GLuint texsky0 = loadSkyboxSide("Resources/Textures/wood.bmp", LEFT);
+	//GLuint texsky1 = loadSkyboxSide("Resources/Textures/wood.bmp", RIGHT);
+	//GLuint texsky2 = loadSkyboxSide("Resources/Textures/wood.bmp", TOP);
+	//GLuint texsky3 = loadSkyboxSide("Resources/Textures/wood.bmp", FRONT);
+	//GLuint texsky4 = loadSkyboxSide("Resources/Textures/wood.bmp", BACK);
+	//GLuint texsky5 = loadSkyboxSide("Resources/Textures/wood.bmp", BOTTOM);
+	// 
+	// 
+	//std::vector<GLuint> skytexts = { texsky0 ,texsky1 ,texsky2 ,texsky3 ,texsky4 ,texsky5 };
+
+
+	const char* skytexts[] = {
+	"Resources/Textures/wood.bmp",
+	"Resources/Textures/wood.bmp",
+	"Resources/Textures/wood.bmp",
+	"Resources/Textures/wood.bmp",
+	"Resources/Textures/wood.bmp",
+	"Resources/Textures/wood.bmp",
+	};
+
+	GLuint skytext = loadSkybox(skytexts);
+
+	Skybox skybox = Skybox(skytext);
 
 	//check if we close the window or press the escape button
 	while (!window.isPressed(GLFW_KEY_ESCAPE) &&
@@ -146,6 +176,18 @@ int main()
 
 		plane.draw(shader);
 
+
+		///// Skybox //////
+		glDepthFunc(GL_LEQUAL);
+		skyboxShader.use();
+
+		glUniformMatrix4fv(glGetUniformLocation(skyboxShader.getId(), "view"), 1, GL_FALSE, &ViewMatrix[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(skyboxShader.getId(), "projection"), 1, GL_FALSE, &ProjectionMatrix[0][0]);
+
+		skybox.draw();
+
+		// Switch back to the normal depth function
+		glDepthFunc(GL_LESS);
 		window.update();
 	}
 }
