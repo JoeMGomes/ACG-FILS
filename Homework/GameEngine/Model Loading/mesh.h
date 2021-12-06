@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include "..\Shaders\shader.h"
+#include "..\Statistics/counter.h"
 
 struct Vertex 
 {
