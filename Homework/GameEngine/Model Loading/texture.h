@@ -15,4 +15,4 @@ GLuint loadBMP(const char* imagepath );
 
 GLuint loadSkybox(const char* imagePaths[]);
 
-int loadSkyboxSide(GLuint* skyTexture, const char* imagepath, int side);
+int loadSkyboxSide(const char* imagepath, int side);

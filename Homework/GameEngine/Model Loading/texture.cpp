@@ -80,10 +80,12 @@ GLuint loadSkybox(const char* imagePaths[]) {
 	// These are very important to prevent seams
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	//glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 	for (size_t i = 0; i < 6; i++) {
-		int res = loadSkyboxSide(&textureID , imagePaths[i], i);
+		int res = loadSkyboxSide( imagePaths[i], i);
 		if (res == 0) {
 			printf("Fatal error");
 		}
@@ -92,7 +94,7 @@ GLuint loadSkybox(const char* imagePaths[]) {
 }
 
 
-int loadSkyboxSide(GLuint *skyTexture, const char* imagepath, int side) {
+int loadSkyboxSide(const char* imagepath, int side) {
 
 	printf("Reading image %s\n", imagepath);
 
@@ -140,7 +142,7 @@ int loadSkyboxSide(GLuint *skyTexture, const char* imagepath, int side) {
 
 	fclose(file);
 
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + side, 0, GL_RGB,	width, height,0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + side, 0, GL_RGB,	width, height,0, GL_BGR, GL_UNSIGNED_BYTE, data);
 	delete[] data;
 	 
 	return 1;

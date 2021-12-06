@@ -36,6 +36,7 @@ int main()
 
 	glEnable(GL_DEPTH_TEST);
 
+
 	//Test custom mesh loading
 	std::vector<Vertex> vert; 
 	vert.push_back(Vertex());
@@ -88,24 +89,13 @@ int main()
 	Mesh plane = loader.loadObj("Resources/Models/plane.obj", textures3);
 	
 
-	//GLuint texsky0 = loadSkyboxSide("Resources/Textures/wood.bmp", LEFT);
-	//GLuint texsky1 = loadSkyboxSide("Resources/Textures/wood.bmp", RIGHT);
-	//GLuint texsky2 = loadSkyboxSide("Resources/Textures/wood.bmp", TOP);
-	//GLuint texsky3 = loadSkyboxSide("Resources/Textures/wood.bmp", FRONT);
-	//GLuint texsky4 = loadSkyboxSide("Resources/Textures/wood.bmp", BACK);
-	//GLuint texsky5 = loadSkyboxSide("Resources/Textures/wood.bmp", BOTTOM);
-	// 
-	// 
-	//std::vector<GLuint> skytexts = { texsky0 ,texsky1 ,texsky2 ,texsky3 ,texsky4 ,texsky5 };
-
-
 	const char* skytexts[] = {
-	"Resources/Textures/wood.bmp",
-	"Resources/Textures/wood.bmp",
-	"Resources/Textures/wood.bmp",
-	"Resources/Textures/wood.bmp",
-	"Resources/Textures/wood.bmp",
-	"Resources/Textures/wood.bmp",
+	"Resources/Skyboxes/LearnOGL/right.bmp",
+	"Resources/Skyboxes/LearnOGL/left.bmp",
+	"Resources/Skyboxes/LearnOGL/bottom.bmp",
+	"Resources/Skyboxes/LearnOGL/top.bmp",
+	"Resources/Skyboxes/LearnOGL/front.bmp",
+	"Resources/Skyboxes/LearnOGL/back.bmp",
 	};
 
 	GLuint skytext = loadSkybox(skytexts);
@@ -132,7 +122,7 @@ int main()
 
 		sunShader.use();
 
-		glm::mat4 ProjectionMatrix = glm::perspective(90.0f, window.getWidth() * 1.0f / window.getHeight(), 0.1f, 10000.0f);
+		glm::mat4 ProjectionMatrix = glm::perspective(90.0f, window.getWidth() * 1.0f / window.getHeight() * 1.0f, 0.1f, 10000.0f);
 		glm::mat4 ViewMatrix = glm::lookAt(camera.getCameraPosition(), camera.getCameraPosition() + camera.getCameraViewDirection(), camera.getCameraUp());
 
 		GLuint MatrixID = glGetUniformLocation(sunShader.getId(), "MVP");
@@ -181,7 +171,12 @@ int main()
 		glDepthFunc(GL_LEQUAL);
 		skyboxShader.use();
 
-		glUniformMatrix4fv(glGetUniformLocation(skyboxShader.getId(), "view"), 1, GL_FALSE, &ViewMatrix[0][0]);
+		glm::mat4 view = glm::mat4(1.0f);
+		// We make the mat4 into a mat3 and then a mat4 again in order to get rid of the last row and column
+		// The last row and column affect the translation of the skybox (which we don't want to affect)
+		view = glm::mat4(glm::mat3(glm::lookAt(camera.getCameraPosition(), camera.getCameraPosition() + camera.getCameraViewDirection(), camera.getCameraUp())));
+
+		glUniformMatrix4fv(glGetUniformLocation(skyboxShader.getId(), "view"), 1, GL_FALSE, &view[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(skyboxShader.getId(), "projection"), 1, GL_FALSE, &ProjectionMatrix[0][0]);
 
 		skybox.draw();
