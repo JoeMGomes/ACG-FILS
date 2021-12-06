@@ -1,5 +1,7 @@
 #pragma once
 #include "mesh.h"
+#include "..\Statistics/counter.h"
+
 
 class Skybox {
 

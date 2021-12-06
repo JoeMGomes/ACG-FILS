@@ -1,3 +1,8 @@
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
+
 #include "Graphics\window.h"
 #include "Camera\camera.h"
 #include "Shaders\shader.h"
@@ -5,11 +10,18 @@
 #include "Model Loading\texture.h"
 #include "Model Loading\meshLoaderObj.h"
 #include "Model Loading\skybox.h"
+#include "Statistics/counter.h"
 
 void processKeyboardInput ();
 
+//count initialization with 0
+int Counter::count = 0;
+
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
+unsigned int frameCounter = 0;
+unsigned int currentFPS = 0;
+float currentFrameTime = 0;
 
 Window window("Game Engine", 800, 800);
 Camera camera;
@@ -19,6 +31,13 @@ glm::vec3 lightPos = glm::vec3(-180.0f, 100.0f, -200.0f);
 
 int main()
 {
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGui::StyleColorsDark();
+	ImGui_ImplGlfw_InitForOpenGL(window.getWindow(), true);
+	ImGui_ImplOpenGL3_Init("#version 400");
+	
 	glClearColor(0.2f, 0.8f, 1.0f, 1.0f);
 
 	//building and compiling shader program
@@ -102,6 +121,7 @@ int main()
 
 	Skybox skybox = Skybox(skytext);
 
+
 	//check if we close the window or press the escape button
 	while (!window.isPressed(GLFW_KEY_ESCAPE) &&
 		glfwWindowShouldClose(window.getWindow()) == 0)
@@ -109,9 +129,20 @@ int main()
 		window.clear();
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
+		frameCounter++;
+		if (deltaTime >= 1.0 / 60) {
+			currentFPS = (1.0 / deltaTime) * frameCounter;
+			currentFrameTime = (deltaTime / frameCounter) * 1000;
+			lastFrame = currentFrame;
+			frameCounter = 0;
+			processKeyboardInput(); //Proccess input at a fixed rate. Polling could be done here by we don't want to alter the Window class.
+		}
 
-		processKeyboardInput();
+		//// Start the Dear ImGui frame
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+
 
 		//test mouse input
 		if (window.isMousePressed(GLFW_MOUSE_BUTTON_LEFT))
@@ -166,7 +197,6 @@ int main()
 
 		plane.draw(shader);
 
-
 		///// Skybox //////
 		glDepthFunc(GL_LEQUAL);
 		skyboxShader.use();
@@ -183,8 +213,28 @@ int main()
 
 		// Switch back to the normal depth function
 		glDepthFunc(GL_LESS);
+
+
+		ImGui::Begin("ACG Homework 2");
+		ImGui::Text("Frames per second: %d", currentFPS);
+		ImGui::Text("Frame time: %f miliseconds", currentFrameTime);
+		ImGui::Text("Draw Calls: %d ", Counter::getCount());
+		ImGui::End();
+
+		//Draw ImGUI
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 		window.update();
+
+		Counter::resetCount();
 	}
+
+
+	ImGui_ImplGlfw_Shutdown();
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui::DestroyContext();
+
 }
 
 void processKeyboardInput()
