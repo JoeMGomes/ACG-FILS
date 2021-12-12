@@ -12,7 +12,9 @@ happen when the user presses some keys
 
 # WIP
 - [x] GUI system with relevant information.  
-  **STATUS:** implemented FPS and Draw call counter. No action element yet.
+  **STATUS:** implemented FPS and Draw call counter.  
+  implemented light position and color handles. 
+  No action element yet.
 - [x] Skybox  
   **STATUS** implemented but weird bug on the edges
  

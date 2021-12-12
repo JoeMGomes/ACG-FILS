@@ -2,7 +2,6 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-
 #include "Graphics\window.h"
 #include "Camera\camera.h"
 #include "Shaders\shader.h"
@@ -13,6 +12,7 @@
 #include "Statistics/counter.h"
 
 void processKeyboardInput ();
+void drawGUI();
 
 //count initialization with 0
 int Counter::count = 0;
@@ -23,7 +23,7 @@ unsigned int frameCounter = 0;
 unsigned int currentFPS = 0;
 float currentFrameTime = 0;
 
-Window window("Game Engine", 800, 800);
+Window window("Game Engine", 1200, 800);
 Camera camera;
 
 glm::vec3 lightColor = glm::vec3(1.0f);
@@ -214,16 +214,8 @@ int main()
 		// Switch back to the normal depth function
 		glDepthFunc(GL_LESS);
 
-
-		ImGui::Begin("ACG Homework 2");
-		ImGui::Text("Frames per second: %d", currentFPS);
-		ImGui::Text("Frame time: %f miliseconds", currentFrameTime);
-		ImGui::Text("Draw Calls: %d ", Counter::getCount());
-		ImGui::End();
-
-		//Draw ImGUI
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		//ImGui setup and render
+		drawGUI();
 
 		window.update();
 
@@ -236,6 +228,36 @@ int main()
 	ImGui::DestroyContext();
 
 }
+
+void drawGUI() {
+	// ImGui Setup
+	ImGui::Begin("ACG Homework 2");
+	if (ImGui::CollapsingHeader("-------  Statistics  -------")) {
+		ImGui::Text("Frames per second: %d", currentFPS);
+		ImGui::Text("Frame time: %f miliseconds", currentFrameTime);
+		ImGui::Text("Draw Calls: %d ", Counter::getCount());
+	}
+	if (ImGui::CollapsingHeader("-------  Light Properties  -------")) {
+		ImGui::Text("Light Position"); ImGui::SameLine(); ImGui::SliderFloat3("", glm::value_ptr(lightPos), -200, 200);
+		ImGui::Text("Light Position"); ImGui::SameLine(); ImGui::ColorEdit3("", glm::value_ptr(lightColor));
+	}
+	if (ImGui::CollapsingHeader("-------  Camera Properties  -------")) {
+		auto camPos = camera.getCameraPosition();
+		char str[300];
+		sprintf_s(str, 300, "Camera Position x : %.02f y : %.02f z : %.02f", camPos.x, camPos.y, camPos.z);
+		ImGui::Text(str);
+		auto camLookAt = camPos + camera.getCameraViewDirection();
+		char str2[300];
+		sprintf_s(str2, 300, "Camera View Direction x : %.02f y : %.02f z : %.02f", camLookAt.x, camLookAt.y, camLookAt.z);
+		ImGui::Text(str2);
+	}
+	ImGui::End();
+
+	//Draw ImGUI
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
 
 void processKeyboardInput()
 {
