@@ -35,6 +35,8 @@ class Camera
 		void keyboardMoveUp(float cameraSpeed);
 		void keyboardMoveDown(float cameraSpeed);
 
+		void globalMoveDown(float cameraSpeed);
+
 		//TODO: update rotate Ox and Oy to use rotationOx and rotationOy
 		void rotateOx(float angle);
 		void rotateOy(float angle);

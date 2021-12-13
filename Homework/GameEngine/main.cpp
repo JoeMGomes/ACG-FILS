@@ -10,6 +10,7 @@
 #include "Model Loading\meshLoaderObj.h"
 #include "Model Loading\skybox.h"
 #include "Statistics/counter.h"
+#include "Collisions/collision.h"
 
 void processKeyboardInput ();
 void processMouseInput();
@@ -26,6 +27,8 @@ float currentFrameTime = 0;
 
 Window window("Game Engine", 1200, 800);
 Camera camera;
+BoundingBox cameraBB;
+std::vector<BoundingBox> worldObjects;
 
 double lastMousePosX = 600 , lastMousePosY = 400;
 bool firstMouseInput = true;
@@ -57,7 +60,6 @@ int main()
 	GLuint tex3 = loadBMP("Resources/Textures/orange.bmp");
 
 	glEnable(GL_DEPTH_TEST);
-
 
 	//Test custom mesh loading
 	std::vector<Vertex> vert; 
@@ -110,6 +112,21 @@ int main()
 	Mesh box = loader.loadObj("Resources/Models/cube.obj", textures);
 	Mesh plane = loader.loadObj("Resources/Models/plane.obj", textures3);
 	
+	BoundingBox boxCol;
+	boxCol.center = glm::vec3(0.0);
+	boxCol.halfDepth = 2.35f;
+	boxCol.halfHeight = 2.35f;
+	boxCol.halfWidth = 2.85f;
+	worldObjects.push_back(boxCol);
+
+	BoundingBox floorCol;
+	boxCol.center = glm::vec3(0.0f, -20.0f, 0.0f);
+	boxCol.halfDepth = 20.0f;
+	boxCol.halfHeight = 2.0f;
+	boxCol.halfWidth = 20.0f;
+
+	cameraBB.center = camera.getCameraPosition();
+	cameraBB.halfDepth = cameraBB.halfHeight = cameraBB.halfWidth = 0.5f;
 
 	const char* skytexts[] = {
 	"Resources/Skyboxes/LearnOGL/right.bmp",
@@ -126,7 +143,7 @@ int main()
 
 
 	//check if we close the window or press the escape button
-	while (!window.isPressed(GLFW_KEY_ESCAPE) &&
+	while (!window.isPressed(GLFW_KEY_Q) &&
 		glfwWindowShouldClose(window.getWindow()) == 0)
 	{
 		window.clear();
@@ -141,12 +158,22 @@ int main()
 			//Proccess input at a fixed rate. Polling could be done here by we don't want to alter the Window class.
 			processKeyboardInput(); 
 			processMouseInput();
+
+			
+			//Add gravity to player
+			camera.globalMoveDown(30 * deltaTime);
+
 		}
+
+		//Set player bounding box to camera position
+		cameraBB.center = camera.getCameraPosition();
+
 
 		//// Start the Dear ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+
 
 		 //// Code for the light ////
 
@@ -189,6 +216,7 @@ int main()
 		///// Test plane Obj file //////
 
 		ModelMatrix = glm::mat4(1.0);
+		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(10.0f, 10.0f, 10.0f));
 		ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.0f, -20.0f, 0.0f));
 		MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 		glUniformMatrix4fv(MatrixID2, 1, GL_FALSE, &MVP[0][0]);
@@ -314,18 +342,36 @@ void processKeyboardInput()
 		camera.keyboardMoveLeft(cameraSpeed);
 	if (window.isPressed(GLFW_KEY_D))
 		camera.keyboardMoveRight(cameraSpeed);
-	if (window.isPressed(GLFW_KEY_R))
-		camera.keyboardMoveUp(cameraSpeed);
-	if (window.isPressed(GLFW_KEY_F))
-		camera.keyboardMoveDown(cameraSpeed);
+	//if (window.isPressed(GLFW_KEY_R))
+	//	camera.keyboardMoveUp(cameraSpeed);
+	//if (window.isPressed(GLFW_KEY_F))
+	//	camera.keyboardMoveDown(cameraSpeed);
+
+
+	//Collision checking code
+	//If there is a collision reverse the last applied movements
+	// Fairly ineficiente since this has to check all objects in the world
+	for (auto& b : worldObjects) {
+		cameraSpeed = -cameraSpeed;
+		if (BoundingBox::checkCollision(cameraBB, b)) {
+			if (window.isPressed(GLFW_KEY_W))
+				camera.keyboardMoveFront(cameraSpeed);
+			if (window.isPressed(GLFW_KEY_S))
+				camera.keyboardMoveBack(cameraSpeed);
+			if (window.isPressed(GLFW_KEY_A))
+				camera.keyboardMoveLeft(cameraSpeed);
+			if (window.isPressed(GLFW_KEY_D))
+				camera.keyboardMoveRight(cameraSpeed);
+		}
+	}
 
 	//rotation
-	if (window.isPressed(GLFW_KEY_LEFT))
+	/*if (window.isPressed(GLFW_KEY_LEFT))
 		camera.rotateOy(cameraSpeed);
 	if (window.isPressed(GLFW_KEY_RIGHT))
 		camera.rotateOy(-cameraSpeed);
 	if (window.isPressed(GLFW_KEY_UP))
 		camera.rotateOx(cameraSpeed);
 	if (window.isPressed(GLFW_KEY_DOWN))
-		camera.rotateOx(-cameraSpeed);
+		camera.rotateOx(-cameraSpeed);*/
 }

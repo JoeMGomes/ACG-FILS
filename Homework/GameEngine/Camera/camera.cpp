@@ -62,6 +62,12 @@ void Camera::keyboardMoveDown(float cameraSpeed)
 	cameraPosition -= cameraUp * cameraSpeed;
 }
 
+void Camera::globalMoveDown(float cameraSpeed)
+{
+	cameraPosition -= glm::vec3(0, 1, 0) * cameraSpeed;
+
+}
+
 void Camera::rotateOx(float angle)
 {	
 	cameraViewDirection = glm::normalize(glm::vec3((glm::rotate(glm::mat4(1.0f), angle, cameraRight) * glm::vec4(cameraViewDirection, 1))));

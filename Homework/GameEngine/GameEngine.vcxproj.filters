@@ -116,6 +116,9 @@
     <ClInclude Include="Statistics\counter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Collisions\collision.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\vertex_shader.glsl" />
