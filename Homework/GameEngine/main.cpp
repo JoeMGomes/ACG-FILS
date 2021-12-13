@@ -12,6 +12,7 @@
 #include "Statistics/counter.h"
 
 void processKeyboardInput ();
+void processMouseInput();
 void drawGUI();
 
 //count initialization with 0
@@ -26,6 +27,8 @@ float currentFrameTime = 0;
 Window window("Game Engine", 1200, 800);
 Camera camera;
 
+double lastMousePosX = 600 , lastMousePosY = 400;
+bool firstMouseInput = true;
 glm::vec3 lightColor = glm::vec3(1.0f);
 glm::vec3 lightPos = glm::vec3(-180.0f, 100.0f, -200.0f);
 
@@ -135,7 +138,9 @@ int main()
 			currentFrameTime = (deltaTime / frameCounter) * 1000;
 			lastFrame = currentFrame;
 			frameCounter = 0;
-			processKeyboardInput(); //Proccess input at a fixed rate. Polling could be done here by we don't want to alter the Window class.
+			//Proccess input at a fixed rate. Polling could be done here by we don't want to alter the Window class.
+			processKeyboardInput(); 
+			processMouseInput();
 		}
 
 		//// Start the Dear ImGui frame
@@ -143,12 +148,6 @@ int main()
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-
-		//test mouse input
-		if (window.isMousePressed(GLFW_MOUSE_BUTTON_LEFT))
-		{
-			std::cout << "Pressing mouse button" << std::endl;
-		}
 		 //// Code for the light ////
 
 		sunShader.use();
@@ -259,8 +258,51 @@ void drawGUI() {
 }
 
 
+void processMouseInput() {
+
+	double xpos, ypos;
+	window.getMousePos(ypos, xpos);
+
+	if (firstMouseInput) // initially set to true
+	{
+		lastMousePosX = xpos;
+		lastMousePosY = ypos;
+		firstMouseInput = false;
+	}
+
+
+	double xoffset = xpos - lastMousePosX;
+	double yoffset = lastMousePosY - ypos ;
+	lastMousePosX = xpos;
+	lastMousePosY = ypos;
+
+	double sensitivity = 0.1f;
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	camera.rotationOx -= xoffset;
+	camera.rotationOy -= yoffset;
+
+	if (camera.rotationOx > 89.0f)
+		camera.rotationOx = 89.0f;
+	if (camera.rotationOx < -89.0f)
+		camera.rotationOx = -89.0f;
+
+	camera.rotate();
+}
+
+
 void processKeyboardInput()
 {
+	//Show mouse cursor
+	if (window.isPressed(GLFW_KEY_Z)) {
+		glfwSetInputMode(window.getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+	if (window.isPressed(GLFW_KEY_X)) {
+		glfwSetInputMode(window.getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	}
+
+
 	float cameraSpeed = 30 * deltaTime;
 
 	//translation

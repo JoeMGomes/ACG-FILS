@@ -13,7 +13,7 @@ class Camera
 		glm::vec3 cameraViewDirection;
 		glm::vec3 cameraUp;
 		glm::vec3 cameraRight;
-
+	public:
 		//rotation - to be removed
 		float rotationOx;
 		float rotationOy;
@@ -35,7 +35,9 @@ class Camera
 		void keyboardMoveUp(float cameraSpeed);
 		void keyboardMoveDown(float cameraSpeed);
 
+		//TODO: update rotate Ox and Oy to use rotationOx and rotationOy
 		void rotateOx(float angle);
 		void rotateOy(float angle);
+		void rotate();
 };
 
