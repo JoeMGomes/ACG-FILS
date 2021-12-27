@@ -68,6 +68,16 @@ void Camera::globalMoveDown(float cameraSpeed)
 
 }
 
+void Camera::FPSForward(float cameraSpeed){
+
+	cameraPosition += glm::normalize(glm::vec3(cameraViewDirection.x, 0,cameraViewDirection.z)) * cameraSpeed;
+}
+
+void Camera::FPSRight(float cameraSpeed) {
+
+	cameraPosition += glm::normalize(glm::cross(cameraViewDirection, cameraUp)) * cameraSpeed;
+}
+
 void Camera::rotateOx(float angle)
 {	
 	cameraViewDirection = glm::normalize(glm::vec3((glm::rotate(glm::mat4(1.0f), angle, cameraRight) * glm::vec4(cameraViewDirection, 1))));

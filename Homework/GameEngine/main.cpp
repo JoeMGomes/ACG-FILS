@@ -26,7 +26,7 @@ unsigned int currentFPS = 0;
 float currentFrameTime = 0;
 
 Window window("Game Engine", 1200, 800);
-Camera camera;
+Camera camera(glm::vec3(0,20,20));
 BoundingBox cameraBB;
 std::vector<BoundingBox> worldObjects;
 
@@ -34,6 +34,8 @@ double lastMousePosX = 600 , lastMousePosY = 400;
 bool firstMouseInput = true;
 glm::vec3 lightColor = glm::vec3(1.0f);
 glm::vec3 lightPos = glm::vec3(-180.0f, 100.0f, -200.0f);
+
+bool flyMode = false;
 
 int main()
 {
@@ -114,16 +116,16 @@ int main()
 	
 	BoundingBox boxCol;
 	boxCol.center = glm::vec3(0.0);
-	boxCol.halfDepth = 2.35f;
-	boxCol.halfHeight = 2.35f;
-	boxCol.halfWidth = 2.85f;
+	boxCol.halfDepth = 2.5f;
+	boxCol.halfHeight = 2.5f;
+	boxCol.halfWidth = 2.5f;
 	worldObjects.push_back(boxCol);
 
 	BoundingBox floorCol;
-	boxCol.center = glm::vec3(0.0f, -20.0f, 0.0f);
-	boxCol.halfDepth = 20.0f;
-	boxCol.halfHeight = 2.0f;
-	boxCol.halfWidth = 20.0f;
+	floorCol.center = glm::vec3(0.0f, 0.0f, 0.0f);
+	floorCol.halfDepth = 30.0f;
+	floorCol.halfHeight = 2.0f;
+	floorCol.halfWidth = 30.0f;
 
 	cameraBB.center = camera.getCameraPosition();
 	cameraBB.halfDepth = cameraBB.halfHeight = cameraBB.halfWidth = 0.5f;
@@ -155,18 +157,22 @@ int main()
 			currentFrameTime = (deltaTime / frameCounter) * 1000;
 			lastFrame = currentFrame;
 			frameCounter = 0;
-			//Proccess input at a fixed rate. Polling could be done here by we don't want to alter the Window class.
+			//Proccess input at a fixed rate. Polling could be done here but we don't want to alter the Window class.
 			processKeyboardInput(); 
 			processMouseInput();
 
 			
 			//Add gravity to player
-			camera.globalMoveDown(30 * deltaTime);
-
+			camera.globalMoveDown(9.8 * deltaTime);
+			// Update camera bounding box after gravity. I dont like that we do this two times but it works
+			cameraBB.center = camera.getCameraPosition();
+			//If touched the floor pull back up
+			if (BoundingBox::checkCollision(cameraBB, floorCol)) {
+				camera.globalMoveDown(-9.8 * deltaTime);
+			}
 		}
 
-		//Set player bounding box to camera position
-		cameraBB.center = camera.getCameraPosition();
+
 
 
 		//// Start the Dear ImGui frame
@@ -216,8 +222,8 @@ int main()
 		///// Test plane Obj file //////
 
 		ModelMatrix = glm::mat4(1.0);
-		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(10.0f, 10.0f, 10.0f));
-		ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.0f, -20.0f, 0.0f));
+		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.0f, 1.0f, 1.0f));
+		ModelMatrix = glm::translate(ModelMatrix, floorCol.center);
 		MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 		glUniformMatrix4fv(MatrixID2, 1, GL_FALSE, &MVP[0][0]);
 		glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
@@ -278,6 +284,10 @@ void drawGUI() {
 		sprintf_s(str2, 300, "Camera View Direction x : %.02f y : %.02f z : %.02f", camLookAt.x, camLookAt.y, camLookAt.z);
 		ImGui::Text(str2);
 	}
+	ImGui::Text("Fly Mode"); ImGui::SameLine();
+	if (ImGui::Checkbox("", &flyMode)) {
+
+	}
 	ImGui::End();
 
 	//Draw ImGUI
@@ -297,7 +307,6 @@ void processMouseInput() {
 		lastMousePosY = ypos;
 		firstMouseInput = false;
 	}
-
 
 	double xoffset = xpos - lastMousePosX;
 	double yoffset = lastMousePosY - ypos ;
@@ -319,7 +328,33 @@ void processMouseInput() {
 	camera.rotate();
 }
 
-
+void moveCamera(float cameraSpeed) {
+	if (flyMode) {
+		if (window.isPressed(GLFW_KEY_W))
+			camera.keyboardMoveFront(cameraSpeed);
+		if (window.isPressed(GLFW_KEY_S))
+			camera.keyboardMoveBack(cameraSpeed);
+		if (window.isPressed(GLFW_KEY_A))
+			camera.keyboardMoveLeft(cameraSpeed);
+		if (window.isPressed(GLFW_KEY_D))
+			camera.keyboardMoveRight(cameraSpeed);
+		if (window.isPressed(GLFW_KEY_R))
+			camera.keyboardMoveUp(cameraSpeed);
+		if (window.isPressed(GLFW_KEY_F))
+			camera.keyboardMoveDown(cameraSpeed);
+	}
+	//FPS Mode
+	else {
+		if (window.isPressed(GLFW_KEY_W))
+			camera.FPSForward(cameraSpeed);
+		if (window.isPressed(GLFW_KEY_S))
+			camera.FPSForward(-cameraSpeed);
+		if (window.isPressed(GLFW_KEY_A))
+			camera.FPSRight(-cameraSpeed);
+		if (window.isPressed(GLFW_KEY_D))
+			camera.FPSRight(cameraSpeed);
+	}
+}
 void processKeyboardInput()
 {
 	//Show mouse cursor
@@ -330,38 +365,19 @@ void processKeyboardInput()
 		glfwSetInputMode(window.getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 
-
 	float cameraSpeed = 30 * deltaTime;
-
-	//translation
-	if (window.isPressed(GLFW_KEY_W))
-		camera.keyboardMoveFront(cameraSpeed);
-	if (window.isPressed(GLFW_KEY_S))
-		camera.keyboardMoveBack(cameraSpeed);
-	if (window.isPressed(GLFW_KEY_A))
-		camera.keyboardMoveLeft(cameraSpeed);
-	if (window.isPressed(GLFW_KEY_D))
-		camera.keyboardMoveRight(cameraSpeed);
-	//if (window.isPressed(GLFW_KEY_R))
-	//	camera.keyboardMoveUp(cameraSpeed);
-	//if (window.isPressed(GLFW_KEY_F))
-	//	camera.keyboardMoveDown(cameraSpeed);
-
+	moveCamera(cameraSpeed);
+	// Update camera bounding box after input
+	cameraBB.center = camera.getCameraPosition();
 
 	//Collision checking code
 	//If there is a collision reverse the last applied movements
 	// Fairly ineficiente since this has to check all objects in the world
 	for (auto& b : worldObjects) {
-		cameraSpeed = -cameraSpeed;
 		if (BoundingBox::checkCollision(cameraBB, b)) {
-			if (window.isPressed(GLFW_KEY_W))
-				camera.keyboardMoveFront(cameraSpeed);
-			if (window.isPressed(GLFW_KEY_S))
-				camera.keyboardMoveBack(cameraSpeed);
-			if (window.isPressed(GLFW_KEY_A))
-				camera.keyboardMoveLeft(cameraSpeed);
-			if (window.isPressed(GLFW_KEY_D))
-				camera.keyboardMoveRight(cameraSpeed);
+			moveCamera(-cameraSpeed);
+			// Update camera bounding box after reverting input
+			cameraBB.center = camera.getCameraPosition();
 		}
 	}
 
@@ -375,3 +391,5 @@ void processKeyboardInput()
 	if (window.isPressed(GLFW_KEY_DOWN))
 		camera.rotateOx(-cameraSpeed);*/
 }
+
+

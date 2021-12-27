@@ -8,9 +8,9 @@ struct BoundingBox
 	float halfWidth, halfHeight, halfDepth;
 
 	static bool checkCollision(const BoundingBox& a , const BoundingBox& b) {
-		return (a.center.x - b.halfWidth  <= b.center.x + b.halfWidth  && a.center.x + b.halfWidth  >= b.center.x - b.halfWidth) &&
-			   (a.center.z - b.halfDepth  <= b.center.z + b.halfDepth  && a.center.z + b.halfDepth  >= b.center.z - b.halfDepth) &&
-			   (a.center.y - b.halfHeight <= b.center.y + b.halfHeight && a.center.y + b.halfHeight >= b.center.y - b.halfHeight);
+		return (a.center.x - a.halfWidth  <= b.center.x + b.halfWidth  && a.center.x + a.halfWidth  >= b.center.x - b.halfWidth) &&
+			   (a.center.z - a.halfDepth  <= b.center.z + b.halfDepth  && a.center.z + a.halfDepth  >= b.center.z - b.halfDepth) &&
+			   (a.center.y - a.halfHeight <= b.center.y + b.halfHeight && a.center.y + a.halfHeight >= b.center.y - b.halfHeight);
 	}
 
 

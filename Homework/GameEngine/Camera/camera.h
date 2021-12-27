@@ -37,6 +37,10 @@ class Camera
 
 		void globalMoveDown(float cameraSpeed);
 
+		void FPSForward(float cameraSpeed);
+
+		void FPSRight(float cameraSpeed);
+
 		//TODO: update rotate Ox and Oy to use rotationOx and rotationOy
 		void rotateOx(float angle);
 		void rotateOy(float angle);
