@@ -141,6 +141,7 @@
     <ClCompile Include="Model Loading\skybox.cpp" />
     <ClCompile Include="Shaders\shader.cpp" />
     <ClCompile Include="Model Loading\texture.cpp" />
+    <ClCompile Include="Terrain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Dependencies\imgui\imconfig.h" />
@@ -162,9 +163,12 @@
     <ClInclude Include="Shaders\shader.h" />
     <ClInclude Include="Model Loading\texture.h" />
     <ClInclude Include="Statistics\counter.h" />
+    <ClInclude Include="Terrain.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\fragment_shader.glsl" />
+    <None Include="Shaders\mountain_fragment_shader.glsl" />
+    <None Include="Shaders\mountain_vertex_shader.glsl" />
     <None Include="Shaders\skybox_frag.glsl" />
     <None Include="Shaders\skybox_vert.glsl" />
     <None Include="Shaders\sun_fragment_shader.glsl" />
@@ -174,11 +178,6 @@
   <ItemGroup>
     <Image Include="Resources\Textures\rock.bmp" />
     <Image Include="Resources\Textures\wood.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="Resources\Models\sphere.obj">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </Object>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
