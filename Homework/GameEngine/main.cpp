@@ -12,6 +12,7 @@
 #include "Statistics/counter.h"
 #include "Collisions/collision.h"
 #include "Terrain.h"
+#include "main.h"
 
 void processKeyboardInput ();
 void processMouseInput();
@@ -25,6 +26,7 @@ float lastFrame = 0.0f;
 unsigned int frameCounter = 0;
 unsigned int currentFPS = 0;
 float currentFrameTime = 0;
+unsigned int seed = 29345843;
 
 Window window("Game Engine", 1200, 800);
 Camera camera(glm::vec3(0,20,20));
@@ -122,7 +124,8 @@ int main()
 	Mesh box = loader.loadObj("Resources/Models/cube.obj", textures);
 	Mesh plane = loader.loadObj("Resources/Models/plane.obj", textures3);
 	//Mesh mountain = loader.loadObj("Resources/Models/plane.obj", textures4);
-	Terrain mountain = Terrain(5, 5);
+	TerrainChunk mountain = TerrainChunk(32, 32,textures4);
+	TerrainChunk mountain2 = TerrainChunk(32, 32, textures2,32,0);
 	
 	BoundingBox boxCol;
 	boxCol.center = glm::vec3(0.0);
@@ -218,6 +221,7 @@ int main()
 		GLuint MatrixID2 = glGetUniformLocation(shader.getId(), "MVP");
 		GLuint ModelMatrixID = glGetUniformLocation(shader.getId(), "model");
 
+
 		ModelMatrix = glm::mat4(1.0);
 		ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.0f, 0.0f, 0.0f));
 		MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
@@ -245,12 +249,24 @@ int main()
 
 		ModelMatrix = glm::mat4(1.0);
 		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(0.2f, 0.2f, 0.2f));
-		ModelMatrix = glm::translate(ModelMatrix, glm::vec3(50.0f, 1.0f, 3.0f));
+		ModelMatrix = glm::translate(ModelMatrix, glm::vec3(50.0f, 5.0f, 3.0f));
 		MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 		glUniformMatrix4fv(MatrixID2, 1, GL_FALSE, &MVP[0][0]);
 		glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
+		glUniform3f(glGetUniformLocation(mountainShader.getId(), "lightColor"), lightColor.x, lightColor.y, lightColor.z);
+		glUniform3f(glGetUniformLocation(mountainShader.getId(), "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+		glUniform3f(glGetUniformLocation(mountainShader.getId(), "viewPos"), camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
+
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		mountain.draw(shader);
+		mountain.draw(mountainShader);
+		ModelMatrix = glm::translate(ModelMatrix, glm::vec3(32.0f, 0.0f, 0.0f));
+		MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+		glUniformMatrix4fv(MatrixID2, 1, GL_FALSE, &MVP[0][0]);
+		glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
+		glUniform3f(glGetUniformLocation(mountainShader.getId(), "lightColor"), lightColor.x, lightColor.y, lightColor.z);
+		glUniform3f(glGetUniformLocation(mountainShader.getId(), "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+		glUniform3f(glGetUniformLocation(mountainShader.getId(), "viewPos"), camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
+		mountain2.draw(mountainShader);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 

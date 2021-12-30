@@ -12,19 +12,22 @@ out vec2 textureCoord;
 out vec3 norm;
 out vec3 fragPos;
 
+
 uniform mat4 MVP;
 uniform mat4 model;
 
-float random(in vec2 st){
-	return fract(sin(dot(st.xy,vec2(23.7836452,98.23412)))*3467.9238470);
-}
+
+const mat3 m3  = mat3( 0.00,  0.80,  0.60,
+                      -0.80,  0.36, -0.48,
+                      -0.60, -0.48,  0.64 );
+const mat3 m3i = mat3( 0.00, -0.80, -0.60,
+                       0.80,  0.36, -0.48,
+                       0.60, -0.48,  0.64 );
 
 void main()
 {
 	gl_Position = MVP * vec4(pos, 1.0f);
-	vec2 st = vec2(gl_Position.x, gl_Position.z);
-//	gl_Position.y += random(st);
 	textureCoord = texCoord;
 	fragPos = vec3(model * vec4(gl_Position.xyz, 1.0f));
-	norm = mat3(transpose(inverse(model)))*normals;
+    norm = mat3(transpose(inverse(model)))*normals; 
 }

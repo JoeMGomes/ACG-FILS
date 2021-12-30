@@ -142,6 +142,7 @@
     <ClCompile Include="Shaders\shader.cpp" />
     <ClCompile Include="Model Loading\texture.cpp" />
     <ClCompile Include="Terrain.cpp" />
+    <ClCompile Include="Utils\SimplexNoise.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Dependencies\imgui\imconfig.h" />
@@ -156,6 +157,7 @@
     <ClInclude Include="Camera\camera.h" />
     <ClInclude Include="Collisions\collision.h" />
     <ClInclude Include="Graphics\window.h" />
+    <ClInclude Include="main.h" />
     <ClInclude Include="Model Loading\meshLoaderObj.h" />
     <ClInclude Include="Model Loading\mesh.h" />
     <ClInclude Include="Model Loading\skybox.h" />
@@ -164,10 +166,12 @@
     <ClInclude Include="Model Loading\texture.h" />
     <ClInclude Include="Statistics\counter.h" />
     <ClInclude Include="Terrain.h" />
+    <ClInclude Include="Utils\SimplexNoise.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\fragment_shader.glsl" />
     <None Include="Shaders\mountain_fragment_shader.glsl" />
+    <None Include="Shaders\mountain_geom_shader.glsl" />
     <None Include="Shaders\mountain_vertex_shader.glsl" />
     <None Include="Shaders\skybox_frag.glsl" />
     <None Include="Shaders\skybox_vert.glsl" />

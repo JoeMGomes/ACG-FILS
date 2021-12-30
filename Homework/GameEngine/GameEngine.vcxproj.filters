@@ -87,6 +87,9 @@
     <ClCompile Include="Terrain.cpp">
       <Filter>Source Files\Terrain</Filter>
     </ClCompile>
+    <ClCompile Include="Utils\SimplexNoise.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics\window.h">
@@ -149,6 +152,12 @@
     <ClInclude Include="Terrain.h">
       <Filter>Header Files\Terrain</Filter>
     </ClInclude>
+    <ClInclude Include="main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\SimplexNoise.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\vertex_shader.glsl">
@@ -173,6 +182,9 @@
       <Filter>Shader Files\Mountain</Filter>
     </None>
     <None Include="Shaders\mountain_vertex_shader.glsl">
+      <Filter>Shader Files\Mountain</Filter>
+    </None>
+    <None Include="Shaders\mountain_geom_shader.glsl">
       <Filter>Shader Files\Mountain</Filter>
     </None>
   </ItemGroup>
