@@ -38,7 +38,8 @@ bool firstMouseInput = true;
 glm::vec3 lightColor = glm::vec3(1.0f);
 glm::vec3 lightPos = glm::vec3(-180.0f, 100.0f, -200.0f);
 
-bool flyMode = false;
+bool flyMode = true;
+bool gLines = false;
 
 int main()
 {
@@ -65,6 +66,7 @@ int main()
 	GLuint tex2 = loadBMP("Resources/Textures/rock.bmp");
 	GLuint tex3 = loadBMP("Resources/Textures/orange.bmp");
 	GLuint tex4 = loadBMP("Resources/Textures/purple.bmp");
+	
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -124,8 +126,8 @@ int main()
 	Mesh box = loader.loadObj("Resources/Models/cube.obj", textures);
 	Mesh plane = loader.loadObj("Resources/Models/plane.obj", textures3);
 	//Mesh mountain = loader.loadObj("Resources/Models/plane.obj", textures4);
-	TerrainChunk mountain = TerrainChunk(32, 32,textures4);
-	TerrainChunk mountain2 = TerrainChunk(32, 32, textures2,32,0);
+	TerrainChunk mountain = TerrainChunk(300, 300);
+	TerrainChunk mountain2 = TerrainChunk(32, 32,32,0);
 	
 	BoundingBox boxCol;
 	boxCol.center = glm::vec3(0.0);
@@ -180,7 +182,7 @@ int main()
 			// Update camera bounding box after gravity. I dont like that we do this two times but it works
 			cameraBB.center = camera.getCameraPosition();
 			//If touched the floor pull back up
-			if (BoundingBox::checkCollision(cameraBB, floorCol)) {
+			if (BoundingBox::checkCollision(cameraBB, floorCol) || flyMode) {
 				camera.globalMoveDown(-9.8 * deltaTime);
 			}
 		}
@@ -231,7 +233,7 @@ int main()
 		glUniform3f(glGetUniformLocation(shader.getId(), "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 		glUniform3f(glGetUniformLocation(shader.getId(), "viewPos"), camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 
-		box.draw(shader);
+		//box.draw(shader);
 
 		///// Test plane Obj file //////
 
@@ -242,32 +244,30 @@ int main()
 		glUniformMatrix4fv(MatrixID2, 1, GL_FALSE, &MVP[0][0]);
 		glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
 
-		plane.draw(shader);
+		//plane.draw(shader);
 
 		///// Mountain plain test /////
 		mountainShader.use();
 
-		ModelMatrix = glm::mat4(1.0);
-		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(0.2f, 0.2f, 0.2f));
-		ModelMatrix = glm::translate(ModelMatrix, glm::vec3(50.0f, 5.0f, 3.0f));
-		MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
-		glUniformMatrix4fv(MatrixID2, 1, GL_FALSE, &MVP[0][0]);
-		glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
-		glUniform3f(glGetUniformLocation(mountainShader.getId(), "lightColor"), lightColor.x, lightColor.y, lightColor.z);
-		glUniform3f(glGetUniformLocation(mountainShader.getId(), "lightPos"), lightPos.x, lightPos.y, lightPos.z);
-		glUniform3f(glGetUniformLocation(mountainShader.getId(), "viewPos"), camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
+		MatrixID2 = glGetUniformLocation(mountainShader.getId(), "MVP");
+		ModelMatrixID = glGetUniformLocation(mountainShader.getId(), "model");
 
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		mountain.draw(mountainShader);
-		ModelMatrix = glm::translate(ModelMatrix, glm::vec3(32.0f, 0.0f, 0.0f));
+		ModelMatrix = glm::mat4(1.0);
+		ModelMatrix = glm::translate(ModelMatrix, glm::vec3(-150.0f, -20.0f, -150.0f));
+		//ModelMatrix = glm::scale(ModelMatrix, glm::vec3(10/300.0f));
 		MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 		glUniformMatrix4fv(MatrixID2, 1, GL_FALSE, &MVP[0][0]);
 		glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
 		glUniform3f(glGetUniformLocation(mountainShader.getId(), "lightColor"), lightColor.x, lightColor.y, lightColor.z);
 		glUniform3f(glGetUniformLocation(mountainShader.getId(), "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 		glUniform3f(glGetUniformLocation(mountainShader.getId(), "viewPos"), camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
-		mountain2.draw(mountainShader);
+		glUniform1f(glGetUniformLocation(mountainShader.getId(), "maxHeight"), mountain.maxHeight);
+
+		mountain.draw(mountainShader);
+		if(gLines) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+		
 
 
 		///// Skybox //////
@@ -403,6 +403,19 @@ void processKeyboardInput()
 	}
 	if (window.isPressed(GLFW_KEY_X)) {
 		glfwSetInputMode(window.getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	}
+	if (window.isPressed(GLFW_KEY_V)) {
+		flyMode = false;
+	}
+	if (window.isPressed(GLFW_KEY_C)) {
+		flyMode = true;
+	}
+
+	if (window.isPressed(GLFW_KEY_B)) {
+		gLines = false;
+	}
+	if (window.isPressed(GLFW_KEY_N)) {
+		gLines = true;
 	}
 
 	float cameraSpeed = 30 * deltaTime;

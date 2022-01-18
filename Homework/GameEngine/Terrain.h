@@ -15,10 +15,13 @@ class TerrainChunk: public Mesh
 		static Shader mountainShader;
 		float* noise;
 		float scalingBias;
+		float zoom;
 		static SimplexNoise* noiseMaker;
-		TerrainChunk(int width, int height, std::vector<Texture> texture,int startX=0, int startY =0, float maxHeight = 15);
+		TerrainChunk(int width, int height,int startX=0, int startY =0, float maxHeight = 100);
+		void calculateNormals();
 private:
 	float seed;
+	void loadTexture();
 };
 
 class Terrain{
@@ -27,5 +30,4 @@ private:
 
 public:
 	Terrain(int rows, int cols, std::vector<Texture> texture, int chunkSize = 32);
-	void draw(Shader shader);
 };

@@ -40,7 +40,8 @@ void Mesh::draw(Shader shader)
 		else if (name == "texture_normal")
 			number = std::to_string(normalNr++);
 		else if (name == "texture_height")
-			number = std::to_string(heightNr++); 
+			number = std::to_string(heightNr++);
+		auto a = name + number;
 
 		glUniform1i(glGetUniformLocation(shader.getId(), (name + number).c_str()), i);
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
