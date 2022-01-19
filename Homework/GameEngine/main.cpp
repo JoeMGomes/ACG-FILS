@@ -12,6 +12,7 @@
 #include "Statistics/counter.h"
 #include "Collisions/collision.h"
 #include "Terrain.h"
+#include "OceanTile.h"
 #include "main.h"
 
 void processKeyboardInput ();
@@ -31,6 +32,7 @@ unsigned int seed = 29345843;
 Window window("Game Engine", 1200, 800);
 Camera camera(glm::vec3(0,20,20));
 BoundingBox cameraBB;
+OceanTile oceanTile(300, 300);
 std::vector<BoundingBox> worldObjects;
 
 double lastMousePosX = 600 , lastMousePosY = 400;
@@ -57,6 +59,7 @@ int main()
 	Shader sunShader("Shaders/sun_vertex_shader.glsl", "Shaders/sun_fragment_shader.glsl");
 	Shader skyboxShader("Shaders/skybox_vert.glsl", "Shaders/skybox_frag.glsl");
 	Shader mountainShader("Shaders/mountain_vertex_shader.glsl","Shaders/mountain_fragment_shader.glsl");
+	Shader oceanShader("Shaders/ocean_vertex_shader.glsl", "Shaders/ocean_fragment_shader.glsl");
 
 	skyboxShader.use();
 	glUniform1i(glGetUniformLocation(skyboxShader.getId(), "skyTexture"), 0);
@@ -128,6 +131,7 @@ int main()
 	//Mesh mountain = loader.loadObj("Resources/Models/plane.obj", textures4);
 	TerrainChunk mountain = TerrainChunk(300, 300);
 	TerrainChunk mountain2 = TerrainChunk(32, 32,32,0);
+	// Ocean
 	
 	BoundingBox boxCol;
 	boxCol.center = glm::vec3(0.0);
@@ -262,12 +266,29 @@ int main()
 		glUniform3f(glGetUniformLocation(mountainShader.getId(), "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 		glUniform3f(glGetUniformLocation(mountainShader.getId(), "viewPos"), camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 		glUniform1f(glGetUniformLocation(mountainShader.getId(), "maxHeight"), mountain.maxHeight);
-
-		mountain.draw(mountainShader);
+		glUniform1f(glGetUniformLocation(mountainShader.getId(), "uTime"), glfwGetTime());
 		if(gLines) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		//mountain.draw(mountainShader);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 		
+		//// Ocean Tile plain test ////
+		oceanShader.use();
+		GLuint oceanShaderID = oceanShader.getId();
+
+		ModelMatrix = glm::mat4(1.0f);
+		
+		MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+
+		glUniformMatrix4fv(glGetUniformLocation(oceanShaderID, "Model"), 1, GL_FALSE, &ModelMatrix[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(oceanShaderID, "MVP"), 1, GL_FALSE, &MVP[0][0]);
+		glUniform3f(glGetUniformLocation(oceanShaderID, "lightColor"), lightColor.x, lightColor.y, lightColor.z);
+		glUniform3f(glGetUniformLocation(oceanShaderID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+		glUniform3f(glGetUniformLocation(oceanShaderID, "viewPos"), camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
+		glUniform1f(glGetUniformLocation(oceanShaderID, "uTime"), glfwGetTime());
+
+
+		oceanTile.draw(oceanShader);
 
 
 		///// Skybox //////
@@ -324,9 +345,21 @@ void drawGUI() {
 		sprintf_s(str2, 300, "Camera View Direction x : %.02f y : %.02f z : %.02f", camLookAt.x, camLookAt.y, camLookAt.z);
 		ImGui::Text(str2);
 	}
+	if (ImGui::CollapsingHeader("-------  Wave Properties  -------")) {
+		char str[300];
+		ImGui::Text("Amplitude"); ImGui::SameLine(); ImGui::SliderFloat("##WaveAmplitude", &oceanTile.amplitude, 2, 21);
+		ImGui::Text("Wave Length"); ImGui::SameLine(); ImGui::SliderFloat("##WaveLength", &oceanTile.waveLength, 15, 500);
+		ImGui::Text("No. Waves"); ImGui::SameLine(); ImGui::SliderFloat("##WaveNumber", &oceanTile.nWaves, 2, 500);
+		ImGui::Text("Speed"); ImGui::SameLine(); ImGui::SliderFloat("##WaveSpeed", &oceanTile.speed, 100, 5000);
+		ImGui::Text("Wave Steepness"); ImGui::SameLine(); ImGui::SliderFloat("##WaveQ", &oceanTile.q, 0, 1.0f);
+
+
+		oceanTile.calculateConstants();
+	}
+
+
 	ImGui::Text("Fly Mode"); ImGui::SameLine();
 	if (ImGui::Checkbox("", &flyMode)) {
-
 	}
 	ImGui::End();
 

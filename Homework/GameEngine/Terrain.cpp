@@ -35,7 +35,7 @@ TerrainChunk::TerrainChunk(int width, int height, int startX, int startY, float 
 	this->loadTexture();
 	this->startX = startX;
 	this->startY = startY;
-	this->zoom = 90.0f;
+	this->zoom = 300.0f;
 	auto lerp = [](float a, float b, float t) {  return (1 - t) * a + t * b; };
 	auto smoothstep = [](float t,float low, float up) {	
 		auto clamp = [](float t, float lower, float upper) {
@@ -56,7 +56,7 @@ TerrainChunk::TerrainChunk(int width, int height, int startX, int startY, float 
 			float vHeight = (noiseMaker->fractal(8, x/zoom + startX, y /zoom + startY)+1)/2;
 			//float t = lerp(0, this->maxHeight, vHeight);
 			//assert(t > 0 && t <= 1);
-			float eastRatio = smoothstep(x,0.2*width,0.7*width);
+			float eastRatio = smoothstep(x,0.1*width,0.7*width);
 			this->vertices.push_back(Vertex(x, vHeight*eastRatio*this->maxHeight, y, 0, 0, 0, x * 1.0f / (this->width - 1), 1.0f * y / (this->height - 1)));
 			if (index < this->width * this->height - this->width - 1 && x < this->width - 1) {
 				this->indices.push_back(index);

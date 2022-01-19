@@ -139,6 +139,7 @@
     <ClCompile Include="Model Loading\meshLoaderObj.cpp" />
     <ClCompile Include="Model Loading\mesh.cpp" />
     <ClCompile Include="Model Loading\skybox.cpp" />
+    <ClCompile Include="OceanTile.cpp" />
     <ClCompile Include="Shaders\shader.cpp" />
     <ClCompile Include="Model Loading\texture.cpp" />
     <ClCompile Include="Terrain.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="Model Loading\mesh.h" />
     <ClInclude Include="Model Loading\skybox.h" />
     <ClInclude Include="Model Loading\stringTokenizer.h" />
+    <ClInclude Include="OceanTile.h" />
     <ClInclude Include="Shaders\shader.h" />
     <ClInclude Include="Model Loading\texture.h" />
     <ClInclude Include="Statistics\counter.h" />
@@ -173,6 +175,8 @@
     <None Include="Shaders\mountain_fragment_shader.glsl" />
     <None Include="Shaders\mountain_geom_shader.glsl" />
     <None Include="Shaders\mountain_vertex_shader.glsl" />
+    <None Include="Shaders\ocean_fragment_shader.glsl" />
+    <None Include="Shaders\ocean_vertex_shader.glsl" />
     <None Include="Shaders\skybox_frag.glsl" />
     <None Include="Shaders\skybox_vert.glsl" />
     <None Include="Shaders\sun_fragment_shader.glsl" />

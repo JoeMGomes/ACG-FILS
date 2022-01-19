@@ -37,6 +37,9 @@
     <Filter Include="Source Files\Terrain">
       <UniqueIdentifier>{660d3d54-1185-4458-b3ab-b52ab41a90ec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader Files\OceanTile">
+      <UniqueIdentifier>{c7b9037c-b5a1-4c6b-9d61-fbe0b028ba50}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -89,6 +92,9 @@
     </ClCompile>
     <ClCompile Include="Utils\SimplexNoise.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OceanTile.cpp">
+      <Filter>Source Files\Terrain</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -158,6 +164,9 @@
     <ClInclude Include="Utils\SimplexNoise.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="OceanTile.h">
+      <Filter>Header Files\Terrain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\vertex_shader.glsl">
@@ -186,6 +195,12 @@
     </None>
     <None Include="Shaders\mountain_geom_shader.glsl">
       <Filter>Shader Files\Mountain</Filter>
+    </None>
+    <None Include="Shaders\ocean_fragment_shader.glsl">
+      <Filter>Shader Files\OceanTile</Filter>
+    </None>
+    <None Include="Shaders\ocean_vertex_shader.glsl">
+      <Filter>Shader Files\OceanTile</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
