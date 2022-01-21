@@ -1,8 +1,10 @@
 #include "Terrain.h"
-#include "main.h"
+#include "../main.h"
 #include <random>
 #include <algorithm>
-#include "Model Loading/texture.h"
+#include "../Utils/SimplexNoise.h"
+#include "../Model Loading/mesh.h"
+#include "../Model Loading/texture.h"
 
 //Shader Terrain::mountainShader = Shader("Shaders/mountain_vertex_shader.glsl", "Shaders/mountain_fragment_shader.glsl");
 SimplexNoise* TerrainChunk::noiseMaker = new SimplexNoise();

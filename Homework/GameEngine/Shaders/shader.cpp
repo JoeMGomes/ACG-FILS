@@ -46,7 +46,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
 	glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
 	if (!success)
 	{
-		std::cout << "Error compiling vertex shader! " << std::endl;
+		std::cout << "Error compiling vertex shader! " << vertexPath << std::endl;
 	}
 
 	// fragment Shader

@@ -1,7 +1,7 @@
 #pragma once
-#include "Model Loading/mesh.h"
-#include "Shaders/shader.h"
-#include "Utils/SimplexNoise.h"
+#include "../Model Loading/mesh.h"
+#include "../Shaders/shader.h"
+#include "../Utils/SimplexNoise.h"
 
 
 

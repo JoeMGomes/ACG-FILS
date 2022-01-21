@@ -87,14 +87,20 @@
     <ClCompile Include="..\Dependencies\imgui\imgui_widgets.cpp">
       <Filter>Source Files\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="Terrain.cpp">
+    <ClCompile Include="TerrainOcean\Terrain.cpp">
       <Filter>Source Files\Terrain</Filter>
     </ClCompile>
     <ClCompile Include="Utils\SimplexNoise.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OceanTile.cpp">
+    <ClCompile Include="TerrainOcean\OceanTile.cpp">
       <Filter>Source Files\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObjects\GameObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Collisions\collision.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -155,7 +161,7 @@
     <ClInclude Include="..\Dependencies\imgui\imstb_truetype.h">
       <Filter>Header Files\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="Terrain.h">
+    <ClInclude Include="TerrainOcean\Terrain.h">
       <Filter>Header Files\Terrain</Filter>
     </ClInclude>
     <ClInclude Include="main.h">
@@ -164,8 +170,11 @@
     <ClInclude Include="Utils\SimplexNoise.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OceanTile.h">
+    <ClInclude Include="TerrainOcean\OceanTile.h">
       <Filter>Header Files\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjects\GameObject.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -202,6 +211,8 @@
     <None Include="Shaders\ocean_vertex_shader.glsl">
       <Filter>Shader Files\OceanTile</Filter>
     </None>
+    <None Include="Shaders\bounding_box_vertex.glsl" />
+    <None Include="Shaders\bounding_box_fragment.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Textures\wood.bmp">

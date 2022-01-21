@@ -134,15 +134,17 @@
     <ClCompile Include="..\Dependencies\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\Dependencies\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Camera\camera.cpp" />
+    <ClCompile Include="Collisions\collision.cpp" />
+    <ClCompile Include="GameObjects\GameObject.cpp" />
     <ClCompile Include="Graphics\window.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Model Loading\meshLoaderObj.cpp" />
     <ClCompile Include="Model Loading\mesh.cpp" />
     <ClCompile Include="Model Loading\skybox.cpp" />
-    <ClCompile Include="OceanTile.cpp" />
+    <ClCompile Include="TerrainOcean\OceanTile.cpp" />
     <ClCompile Include="Shaders\shader.cpp" />
     <ClCompile Include="Model Loading\texture.cpp" />
-    <ClCompile Include="Terrain.cpp" />
+    <ClCompile Include="TerrainOcean\Terrain.cpp" />
     <ClCompile Include="Utils\SimplexNoise.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -157,20 +159,23 @@
     <ClInclude Include="..\Dependencies\imgui\imstb_truetype.h" />
     <ClInclude Include="Camera\camera.h" />
     <ClInclude Include="Collisions\collision.h" />
+    <ClInclude Include="GameObjects\GameObject.h" />
     <ClInclude Include="Graphics\window.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="Model Loading\meshLoaderObj.h" />
     <ClInclude Include="Model Loading\mesh.h" />
     <ClInclude Include="Model Loading\skybox.h" />
     <ClInclude Include="Model Loading\stringTokenizer.h" />
-    <ClInclude Include="OceanTile.h" />
+    <ClInclude Include="TerrainOcean\OceanTile.h" />
     <ClInclude Include="Shaders\shader.h" />
     <ClInclude Include="Model Loading\texture.h" />
     <ClInclude Include="Statistics\counter.h" />
-    <ClInclude Include="Terrain.h" />
+    <ClInclude Include="TerrainOcean\Terrain.h" />
     <ClInclude Include="Utils\SimplexNoise.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shaders\bounding_box_fragment.glsl" />
+    <None Include="Shaders\bounding_box_vertex.glsl" />
     <None Include="Shaders\fragment_shader.glsl" />
     <None Include="Shaders\mountain_fragment_shader.glsl" />
     <None Include="Shaders\mountain_geom_shader.glsl" />
