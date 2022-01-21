@@ -28,13 +28,24 @@ void GameObject::draw(Shader shader)
 void GameObject::setScale(glm::vec3 scale) {
 	
 	this->scale = scale;
+	
 	this->boundingbox = BoundingBox(*mesh);	
 	updateBBox();
+}
+
+void GameObject::setScaleNoUpdate(glm::vec3 scale) {
+	this->scale = scale;
 }
 
 void GameObject::setPosition(glm::vec3 position) {
 	this->position = position;
 	updateBBox();
+}
+
+//DOES NOT UPDATE THE BOUNDING BOX
+void GameObject::setRotation(glm::vec3 rotation)
+{
+	this->rotation = rotation;
 }
 
 

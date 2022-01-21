@@ -20,6 +20,7 @@ public:
 
 	void draw(Shader shader);
 	void setScale(glm::vec3 scale);
+	void setScaleNoUpdate(glm::vec3 scale);
 	void setPosition(glm::vec3 position);
 	void setRotation(glm::vec3 rotation);
 private:

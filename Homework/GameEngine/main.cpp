@@ -16,7 +16,7 @@
 #include "main.h"
 #include "GameObjects/GameObject.h"
 
-void processKeyboardInput ();
+void processKeyboardInput();
 void processMouseInput();
 void drawGUI();
 
@@ -31,12 +31,12 @@ float currentFrameTime = 0;
 unsigned int seed = 29345843;
 
 Window window("Game Engine", 1200, 800);
-Camera camera(glm::vec3(0,20,20));
+Camera camera(glm::vec3(0, 20, 20));
 BoundingBox cameraBB;
 OceanTile oceanTile(300, 300);
 std::vector<BoundingBox> worldObjects;
 
-double lastMousePosX = 600 , lastMousePosY = 400;
+double lastMousePosX = 600, lastMousePosY = 400;
 bool firstMouseInput = true;
 glm::vec3 lightColor = glm::vec3(1.0f);
 glm::vec3 lightPos = glm::vec3(-180.0f, 100.0f, -200.0f);
@@ -45,7 +45,7 @@ bool flyMode = true;
 bool gLines = false;
 bool canMoveCamera = true;
 
-glm::vec3 oceanTranslate = glm::vec3(-321, 0, -150);
+glm::vec3 oceanTranslate = glm::vec3(-321, -3, -150);
 glm::vec3 mountainTranslate = glm::vec3(-26, 0, -150);
 
 int main()
@@ -56,7 +56,9 @@ int main()
 	ImGui::StyleColorsDark();
 	ImGui_ImplGlfw_InitForOpenGL(window.getWindow(), true);
 	ImGui_ImplOpenGL3_Init("#version 400");
-	
+
+	glfwSetInputMode(window.getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 	glClearColor(0.2f, 0.8f, 1.0f, 1.0f);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_DEPTH_TEST);
@@ -65,7 +67,7 @@ int main()
 	Shader phongShader("Shaders/vertex_shader.glsl", "Shaders/fragment_shader.glsl");
 	Shader sunShader("Shaders/sun_vertex_shader.glsl", "Shaders/sun_fragment_shader.glsl");
 	Shader skyboxShader("Shaders/skybox_vert.glsl", "Shaders/skybox_frag.glsl");
-	Shader mountainShader("Shaders/mountain_vertex_shader.glsl","Shaders/mountain_fragment_shader.glsl");
+	Shader mountainShader("Shaders/mountain_vertex_shader.glsl", "Shaders/mountain_fragment_shader.glsl");
 	Shader oceanShader("Shaders/ocean_vertex_shader.glsl", "Shaders/ocean_fragment_shader.glsl");
 	Shader BBShader("Shaders/bounding_box_vertex.glsl", "Shaders/bounding_box_fragment.glsl");
 
@@ -107,6 +109,11 @@ int main()
 	beachBallTextureVector[0].id = loadBMP("Resources/Textures/beachball.bmp");
 	beachBallTextureVector[0].type = "texture_diffuse";
 
+	std::vector<Texture> chairTextureVector;
+	chairTextureVector.push_back(Texture());
+	chairTextureVector[0].id = loadBMP("Resources/Textures/bwood.bmp");
+	chairTextureVector[0].type = "texture_diffuse";
+
 
 	MeshLoaderObj loader;
 	Mesh sun = loader.loadObj("Resources/Models/sphere.obj");
@@ -118,19 +125,33 @@ int main()
 	GameObject crabGO = GameObject(&crab);
 	crabGO.setPosition(glm::vec3(-10, 0.1f, 0.0f));
 	crabGO.setScale(glm::vec3(.1f));
+
+	GameObject crabGO1 = GameObject(&crab);
+	crabGO1.setPosition(glm::vec3(-10, 0.1f, 0.0f));
+	crabGO1.setScale(glm::vec3(.1f));
 	//worldObjects.push_back(crabGO.boundingbox);
 
 
 	Mesh chest = loader.loadObj("Resources/Models/chest.obj", chestTextureVector);
 	GameObject chestGO = GameObject(&chest);
-	chestGO.setPosition(glm::vec3(-3.0, 1.0f, 0.0f));
+	chestGO.setPosition(glm::vec3(-2.0, 1.0f, 12.0f));
+	chestGO.setScale(glm::vec3(.7f));
 	worldObjects.push_back(chestGO.boundingbox);
 
 	Mesh beachBall = loader.loadObj("Resources/Models/beachBall.obj", beachBallTextureVector);
 	GameObject beachBallGO = GameObject(&beachBall);
-	beachBallGO.setPosition(glm::vec3(-3.0, 1.0f, 3.0f));
-	beachBallGO.setScale(glm::vec3(.03f));
+	beachBallGO.setPosition(glm::vec3(2.0, 1.0f, 20.0f));
+	beachBallGO.setScale(glm::vec3(0.03f));
 	worldObjects.push_back(beachBallGO.boundingbox);
+
+	Mesh chair = loader.loadObj("Resources/Models/chair.obj", chairTextureVector);
+	GameObject chairGO = GameObject(&chair);
+	chairGO.setPosition(glm::vec3(-6.0, 1.0f, -2.0f));
+	worldObjects.push_back(chairGO.boundingbox);
+
+	GameObject chairGO1 = GameObject(&chair);
+	chairGO1.setPosition(glm::vec3(-9.0, 1.0f, -4.0f));
+	worldObjects.push_back(chairGO1.boundingbox);
 
 	//The floor is a special case of the bounding box checking so it is not a world object
 	GameObject floorGO = GameObject(&plane);
@@ -166,11 +187,11 @@ int main()
 			lastFrame = currentFrame;
 			frameCounter = 0;
 			//Proccess input at a fixed rate. Polling could be done here but we don't want to alter the Window class.
-			processKeyboardInput(); 
-			if(canMoveCamera)
+			processKeyboardInput();
+			if (canMoveCamera)
 				processMouseInput();
 
-			
+
 			//Add gravity to player
 			camera.globalMoveDown(9.8 * deltaTime);
 			// Update camera bounding box after gravity. I dont like that we do this two times but it works
@@ -205,7 +226,7 @@ int main()
 		phongShader.use();
 
 		///// Test Obj files for box ////
-		{		
+		{
 			glm::mat4  ModelMatrix = glm::mat4(1.0);
 			ModelMatrix = glm::translate(ModelMatrix, chestGO.position);
 			glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
@@ -219,20 +240,45 @@ int main()
 		}
 		//// Crabs////
 		{
+			float x = std::round(glm::sin(currentFrame*0.5) + 0.5) * 2 - 1;
+			float posX = glm::cos(2*currentFrame) * 4;
+			crabGO.setPosition(glm::vec3(posX, crabGO.position.y, crabGO.position.z+ deltaTime * x));
+
 			glm::mat4 ModelMatrix = glm::mat4(1.0);
 			ModelMatrix = glm::translate(ModelMatrix, crabGO.position);
 			ModelMatrix = glm::scale(ModelMatrix, crabGO.scale);
 			glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 			glUniformMatrix4fv(glGetUniformLocation(phongShader.getId(), "MVP"), 1, GL_FALSE, &MVP[0][0]);
 			glUniformMatrix4fv(glGetUniformLocation(phongShader.getId(), "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
-			
+
 			crabGO.mesh->draw(phongShader);
+		}
+		{
+
+			crabGO1.setPosition(glm::vec3(crabGO1.position.x, crabGO1.position.y, crabGO1.position.z));
+			crabGO1.setRotation(glm::vec3(crabGO1.rotation.x , crabGO1.rotation.y + 3* deltaTime, crabGO1.rotation.z));
+
+
+			glm::mat4 ModelMatrix = glm::mat4(1.0);
+			ModelMatrix = glm::rotate(ModelMatrix, crabGO1.rotation.y ,glm::vec3(0.0f,1.0f,0.0f));
+			ModelMatrix = glm::translate(ModelMatrix, crabGO1.position);
+			ModelMatrix = glm::scale(ModelMatrix, crabGO1.scale);
+			glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+			glUniformMatrix4fv(glGetUniformLocation(phongShader.getId(), "MVP"), 1, GL_FALSE, &MVP[0][0]);
+			glUniformMatrix4fv(glGetUniformLocation(phongShader.getId(), "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
+
+			crabGO1.mesh->draw(phongShader);
 		}
 		//// BeachBall////
 		{
-		/*	beachBallGO.setPosition(glm::vec3(beachBallGO.position.x, 
-												glm::sin(currentFrame/10)* deltaTime * 3,
-												beachBallGO.position.z));*/
+			float x = std::fmod(currentFrame, 1.0f);
+
+			float height = -16 * std::pow(x - 0.5f, 2) + 4;
+
+			float scale = -1 * std::pow(x - 0.5f, 2) + 1;
+
+			beachBallGO.setPosition(glm::vec3(beachBallGO.position.x, height, beachBallGO.position.z));
+			beachBallGO.setScaleNoUpdate(glm::vec3(.03f, scale * .03f, .03f));
 
 			glm::mat4 ModelMatrix = glm::mat4(1.0);
 			ModelMatrix = glm::translate(ModelMatrix, beachBallGO.position);
@@ -243,6 +289,27 @@ int main()
 
 			beachBallGO.mesh->draw(phongShader);
 		}
+
+		///// Chairs /////
+		{
+			glm::mat4 ModelMatrix = glm::mat4(1.0);
+			ModelMatrix = glm::translate(ModelMatrix, chairGO.position);
+			ModelMatrix = glm::scale(ModelMatrix, chairGO.scale);
+			glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+			glUniformMatrix4fv(glGetUniformLocation(phongShader.getId(), "MVP"), 1, GL_FALSE, &MVP[0][0]);
+			glUniformMatrix4fv(glGetUniformLocation(phongShader.getId(), "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
+
+			chairGO.mesh->draw(phongShader);
+
+			ModelMatrix = glm::mat4(1.0);
+			ModelMatrix = glm::translate(ModelMatrix, chairGO1.position);
+			ModelMatrix = glm::scale(ModelMatrix, chairGO1.scale);
+			MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+			glUniformMatrix4fv(glGetUniformLocation(phongShader.getId(), "MVP"), 1, GL_FALSE, &MVP[0][0]);
+			glUniformMatrix4fv(glGetUniformLocation(phongShader.getId(), "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
+
+			chairGO1.mesh->draw(phongShader);
+		}
 		/*
 		///// Uncomment to see invisible world boundaries
 		{
@@ -252,10 +319,10 @@ int main()
 			glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 			glUniformMatrix4fv(glGetUniformLocation(phongShader.getId(), "MVP"), 1, GL_FALSE, &MVP[0][0]);
 			glUniformMatrix4fv(glGetUniformLocation(phongShader.getId(), "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
-			
+
 			floorGO.mesh->draw(phongShader);
 		}
-	
+
 		{
 			glm::mat4 ModelMatrix = glm::mat4(1.0);
 			ModelMatrix = glm::scale(ModelMatrix, waterWallGO.scale);
@@ -281,11 +348,11 @@ int main()
 			glUniform3f(glGetUniformLocation(mountainShader.getId(), "viewPos"), camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 			glUniform1f(glGetUniformLocation(mountainShader.getId(), "maxHeight"), mountain.maxHeight);
 			glUniform1f(glGetUniformLocation(mountainShader.getId(), "uTime"), glfwGetTime());
-		
+
 			mountain.draw(mountainShader);
 
 		}
-		
+
 		//// Ocean Tile plain test ////
 		{
 			oceanShader.use();
@@ -306,7 +373,7 @@ int main()
 		}
 
 		///// Bounding Boxes /////
-		
+
 		{
 			//BBShader.use();
 			//glm::mat4 ModelMatrix = glm::mat4(1.0f);
@@ -392,7 +459,7 @@ void drawGUI() {
 	}
 	ImGui::Text("Wireframe"); ImGui::SameLine();
 	if (ImGui::Checkbox("##wireframe", &gLines)) {
-		if(gLines)
+		if (gLines)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		else
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -422,7 +489,7 @@ void processMouseInput() {
 	}
 
 	double xoffset = xpos - lastMousePosX;
-	double yoffset = lastMousePosY - ypos ;
+	double yoffset = lastMousePosY - ypos;
 	lastMousePosX = xpos;
 	lastMousePosY = ypos;
 
