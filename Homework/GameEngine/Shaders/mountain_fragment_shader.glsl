@@ -64,7 +64,6 @@ void main()
 	f *= .55;
 	vec3 m = mix(vec3(.63*f+.2, .7*f+.1, .7*f+.1), vec3(f*.43+.1, f*.3+.2, f*.35+.1), f*.65);
 	resultTex = m*vec3(f*m.x+.7, f*m.y+.7, f*m.z+.7);
-//	resultTex = dirtColor;
 	
 	float ambientStrength = .5f;
 	float specularStrength = 0.0f;

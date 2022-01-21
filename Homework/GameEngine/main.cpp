@@ -45,8 +45,6 @@ bool flyMode = true;
 bool gLines = false;
 bool canMoveCamera = true;
 
-
-
 glm::vec3 oceanTranslate = glm::vec3(-321, 0, -150);
 glm::vec3 mountainTranslate = glm::vec3(-26, 0, -150);
 
@@ -85,43 +83,54 @@ int main()
 	GLuint skytext = loadSkybox(skytexts);
 	Skybox skybox = Skybox(skytext);
 
+	TerrainChunk mountain = TerrainChunk(300, 300);
+
 	//Textures
-	std::vector<Texture> textures;
-	textures.push_back(Texture());
-	textures[0].id = loadBMP("Resources/Textures/wood.bmp");
-	textures[0].type = "texture_diffuse";
-
-	std::vector<Texture> textures2;
-	textures2.push_back(Texture());
-	textures2[0].id = loadBMP("Resources/Textures/rock.bmp");
-	textures2[0].type = "texture_diffuse";
-
-	std::vector<Texture> textures3;
-	textures3.push_back(Texture());
-	textures3[0].id = loadBMP("Resources/Textures/orange.bmp");
-	textures3[0].type = "texture_diffuse";
-
-	std::vector<Texture> textures4;
-	textures4.push_back(Texture());
-	textures4[0].id = loadBMP("Resources/Textures/purple.bmp");
-	textures4[0].type = "texture_diffuse";
+	std::vector<Texture> chestTextureVector;
+	chestTextureVector.push_back(Texture());
+	chestTextureVector[0].id = loadBMP("Resources/Textures/chest_wood.bmp");
+	chestTextureVector[0].type = "texture_diffuse";
 
 
-	// Create Obj files - easier :)
-	// we can add here our textures :)
+	std::vector<Texture> orangeTextureVector;
+	orangeTextureVector.push_back(Texture());
+	orangeTextureVector[0].id = loadBMP("Resources/Textures/orange.bmp");
+	orangeTextureVector[0].type = "texture_diffuse";
+
+	std::vector<Texture> crabTextureVector;
+	crabTextureVector.push_back(Texture());
+	crabTextureVector[0].id = loadBMP("Resources/Textures/mrcrabs.bmp");
+	crabTextureVector[0].type = "texture_diffuse";
+
+	std::vector<Texture> beachBallTextureVector;
+	beachBallTextureVector.push_back(Texture());
+	beachBallTextureVector[0].id = loadBMP("Resources/Textures/beachball.bmp");
+	beachBallTextureVector[0].type = "texture_diffuse";
+
+
 	MeshLoaderObj loader;
 	Mesh sun = loader.loadObj("Resources/Models/sphere.obj");
-	Mesh box = loader.loadObj("Resources/Models/cube.obj", textures);
-	Mesh plane = loader.loadObj("Resources/Models/plane.obj", textures3);
-	Mesh wall = loader.loadObj("Resources/Models/wall.obj", textures3);
+	Mesh plane = loader.loadObj("Resources/Models/plane.obj", orangeTextureVector);
+	Mesh wall = loader.loadObj("Resources/Models/wall.obj", orangeTextureVector);
 
-	TerrainChunk mountain = TerrainChunk(300, 300);
-	TerrainChunk mountain2 = TerrainChunk(32, 32,32,0);
 
-	//GameObjects
-	GameObject boxGO = GameObject(&box);
-	boxGO.setPosition(glm::vec3(-3.0, 1.0f, 0.0f));
-	worldObjects.push_back(boxGO.boundingbox);
+	Mesh crab = loader.loadObj("Resources/Models/crab.obj", crabTextureVector);
+	GameObject crabGO = GameObject(&crab);
+	crabGO.setPosition(glm::vec3(-10, 0.1f, 0.0f));
+	crabGO.setScale(glm::vec3(.1f));
+	//worldObjects.push_back(crabGO.boundingbox);
+
+
+	Mesh chest = loader.loadObj("Resources/Models/chest.obj", chestTextureVector);
+	GameObject chestGO = GameObject(&chest);
+	chestGO.setPosition(glm::vec3(-3.0, 1.0f, 0.0f));
+	worldObjects.push_back(chestGO.boundingbox);
+
+	Mesh beachBall = loader.loadObj("Resources/Models/beachBall.obj", beachBallTextureVector);
+	GameObject beachBallGO = GameObject(&beachBall);
+	beachBallGO.setPosition(glm::vec3(-3.0, 1.0f, 3.0f));
+	beachBallGO.setScale(glm::vec3(.03f));
+	worldObjects.push_back(beachBallGO.boundingbox);
 
 	//The floor is a special case of the bounding box checking so it is not a world object
 	GameObject floorGO = GameObject(&plane);
@@ -185,26 +194,20 @@ int main()
 		//// Code for the light ////
 		{
 			sunShader.use();
-
-			GLuint MatrixID = glGetUniformLocation(sunShader.getId(), "MVP");
-
 			glm::mat4 ModelMatrix = glm::mat4(1.0);
 			ModelMatrix = glm::translate(ModelMatrix, lightPos);
 			glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
-			glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-
+			glUniformMatrix4fv(glGetUniformLocation(sunShader.getId(), "MVP"), 1, GL_FALSE, &MVP[0][0]);
 			sun.draw(sunShader);
 		}
 
-		//// End code for the light ////
 
 		phongShader.use();
 
 		///// Test Obj files for box ////
-
 		{		
 			glm::mat4  ModelMatrix = glm::mat4(1.0);
-			ModelMatrix = glm::translate(ModelMatrix, boxGO.position);
+			ModelMatrix = glm::translate(ModelMatrix, chestGO.position);
 			glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 			glUniformMatrix4fv(glGetUniformLocation(phongShader.getId(), "MVP"), 1, GL_FALSE, &MVP[0][0]);
 			glUniformMatrix4fv(glGetUniformLocation(phongShader.getId(), "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
@@ -212,7 +215,33 @@ int main()
 			glUniform3f(glGetUniformLocation(phongShader.getId(), "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 			glUniform3f(glGetUniformLocation(phongShader.getId(), "viewPos"), camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 
-			boxGO.mesh->draw(phongShader);
+			chestGO.mesh->draw(phongShader);
+		}
+		//// Crabs////
+		{
+			glm::mat4 ModelMatrix = glm::mat4(1.0);
+			ModelMatrix = glm::translate(ModelMatrix, crabGO.position);
+			ModelMatrix = glm::scale(ModelMatrix, crabGO.scale);
+			glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+			glUniformMatrix4fv(glGetUniformLocation(phongShader.getId(), "MVP"), 1, GL_FALSE, &MVP[0][0]);
+			glUniformMatrix4fv(glGetUniformLocation(phongShader.getId(), "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
+			
+			crabGO.mesh->draw(phongShader);
+		}
+		//// BeachBall////
+		{
+		/*	beachBallGO.setPosition(glm::vec3(beachBallGO.position.x, 
+												glm::sin(currentFrame/10)* deltaTime * 3,
+												beachBallGO.position.z));*/
+
+			glm::mat4 ModelMatrix = glm::mat4(1.0);
+			ModelMatrix = glm::translate(ModelMatrix, beachBallGO.position);
+			ModelMatrix = glm::scale(ModelMatrix, beachBallGO.scale);
+			glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+			glUniformMatrix4fv(glGetUniformLocation(phongShader.getId(), "MVP"), 1, GL_FALSE, &MVP[0][0]);
+			glUniformMatrix4fv(glGetUniformLocation(phongShader.getId(), "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
+
+			beachBallGO.mesh->draw(phongShader);
 		}
 		/*
 		///// Uncomment to see invisible world boundaries
