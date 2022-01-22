@@ -16,10 +16,6 @@ void main()
 	//Ambient light
 	float ambientStrength = 0.5;
     vec3 ambient = ambientStrength * lightColor;
-//	vec3 objectColor = vec3(1.0f, 0.5f, 0.31f);
-
-	//vec3 result = ambient * objectColor;
-	//fragColor = vec4(result, 1.0f);
 
 	//Diffuse light
 	vec3 normal = normalize(norm);

@@ -31,7 +31,7 @@ float currentFrameTime = 0;
 unsigned int seed = 29345843;
 
 Window window("Game Engine", 1200, 800);
-Camera camera(glm::vec3(0, 20, 20));
+Camera camera(glm::vec3(0, 10, 20));
 BoundingBox cameraBB;
 OceanTile oceanTile(300, 300);
 std::vector<BoundingBox> worldObjects;
@@ -39,14 +39,13 @@ std::vector<BoundingBox> worldObjects;
 double lastMousePosX = 600, lastMousePosY = 400;
 bool firstMouseInput = true;
 glm::vec3 lightColor = glm::vec3(1.0f);
-glm::vec3 lightPos = glm::vec3(-180.0f, 100.0f, -200.0f);
+glm::vec3 lightPos = glm::vec3(-180.0f, 100.0f, 100.0f);
 
+//Scene Options
 bool flyMode = true;
-bool gLines = false;
 bool canMoveCamera = true;
+bool gLines = false;
 
-glm::vec3 oceanTranslate = glm::vec3(-321, -3, -150);
-glm::vec3 mountainTranslate = glm::vec3(-26, 0, -150);
 
 int main()
 {
@@ -120,7 +119,6 @@ int main()
 	Mesh plane = loader.loadObj("Resources/Models/plane.obj", orangeTextureVector);
 	Mesh wall = loader.loadObj("Resources/Models/wall.obj", orangeTextureVector);
 
-
 	Mesh crab = loader.loadObj("Resources/Models/crab.obj", crabTextureVector);
 	GameObject crabGO = GameObject(&crab);
 	crabGO.setPosition(glm::vec3(-10, 0.1f, 0.0f));
@@ -129,8 +127,6 @@ int main()
 	GameObject crabGO1 = GameObject(&crab);
 	crabGO1.setPosition(glm::vec3(-10, 0.1f, 0.0f));
 	crabGO1.setScale(glm::vec3(.1f));
-	//worldObjects.push_back(crabGO.boundingbox);
-
 
 	Mesh chest = loader.loadObj("Resources/Models/chest.obj", chestTextureVector);
 	GameObject chestGO = GameObject(&chest);
@@ -157,12 +153,12 @@ int main()
 	GameObject floorGO = GameObject(&plane);
 	floorGO.setPosition(glm::vec3(-30.0f, 0.0f, 0.0f));
 	floorGO.setScale(glm::vec3(1.0f, 1.0f, 10.0f));
-
+	//Invisible game object for colision
 	GameObject mountainWallGO = GameObject(&wall);
 	mountainWallGO.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	mountainWallGO.setScale(glm::vec3(1.0f, 1.0f, 10.0f));
 	worldObjects.push_back(mountainWallGO.boundingbox);
-
+	//Invisible game object for colision
 	GameObject waterWallGO = GameObject(&wall);
 	waterWallGO.setPosition(glm::vec3(-60.0f, 0.0f, 0.0f));
 	waterWallGO.setScale(glm::vec3(1.0f, 1.0f, 10.0f));
@@ -190,7 +186,6 @@ int main()
 			processKeyboardInput();
 			if (canMoveCamera)
 				processMouseInput();
-
 
 			//Add gravity to player
 			camera.globalMoveDown(9.8 * deltaTime);
@@ -225,7 +220,7 @@ int main()
 
 		phongShader.use();
 
-		///// Test Obj files for box ////
+		///// Chest ////
 		{
 			glm::mat4  ModelMatrix = glm::mat4(1.0);
 			ModelMatrix = glm::translate(ModelMatrix, chestGO.position);
@@ -339,7 +334,7 @@ int main()
 			mountainShader.use();
 
 			glm::mat4 ModelMatrix = glm::mat4(1.0);
-			ModelMatrix = glm::translate(ModelMatrix, mountainTranslate);
+			ModelMatrix = glm::translate(ModelMatrix, glm::vec3(-26, 0, -150));
 			glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 			glUniformMatrix4fv(glGetUniformLocation(mountainShader.getId(), "MVP"), 1, GL_FALSE, &MVP[0][0]);
 			glUniformMatrix4fv(glGetUniformLocation(mountainShader.getId(), "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
@@ -359,7 +354,7 @@ int main()
 			GLuint oceanShaderID = oceanShader.getId();
 
 			glm::mat4 ModelMatrix = glm::mat4(1.0f);
-			ModelMatrix = glm::translate(ModelMatrix, oceanTranslate);
+			ModelMatrix = glm::translate(ModelMatrix, glm::vec3(-321, -3, -150));
 
 			glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
@@ -373,17 +368,17 @@ int main()
 		}
 
 		///// Bounding Boxes /////
-
+		//Note does not work, just creates a green line bellow objects
 		{
-			//BBShader.use();
-			//glm::mat4 ModelMatrix = glm::mat4(1.0f);
-			////ModelMatrix = glm::translate(ModelMatrix, boxGO.position);
-			////ModelMatrix = glm::scale(ModelMatrix, glm::vec3(5.56f));
-			//glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+		/*	BBShader.use();
+			glm::mat4 ModelMatrix = glm::mat4(1.0f);
+			ModelMatrix = glm::translate(ModelMatrix, chestGO.position);
+			ModelMatrix = glm::scale(ModelMatrix, chestGO.scale);
+			glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
-			////glUniformMatrix4fv(glGetUniformLocation(BBShader.getId(), "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
-			//glUniformMatrix4fv(glGetUniformLocation(BBShader.getId(), "MVP"), 1, GL_FALSE, &MVP[0][0]);
-			//boxGO.boundingbox.draw();
+			glUniformMatrix4fv(glGetUniformLocation(BBShader.getId(), "model"), 1, GL_FALSE, &ModelMatrix[0][0]);
+			glUniformMatrix4fv(glGetUniformLocation(BBShader.getId(), "MVP"), 1, GL_FALSE, &MVP[0][0]);
+			chestGO.boundingbox.draw();*/
 		}
 
 		///// Skybox //////
@@ -464,9 +459,6 @@ void drawGUI() {
 		else
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
-
-	ImGui::Text("Terrain Position"); ImGui::SameLine(); ImGui::SliderFloat3("##mountain", glm::value_ptr(mountainTranslate), -300, 300);
-	ImGui::Text("Water Position"); ImGui::SameLine(); ImGui::SliderFloat3("##water", glm::value_ptr(oceanTranslate), -600, 10);
 
 	ImGui::End();
 
@@ -576,15 +568,6 @@ void processKeyboardInput()
 		}
 	}
 
-	//rotation
-	/*if (window.isPressed(GLFW_KEY_LEFT))
-		camera.rotateOy(cameraSpeed);
-	if (window.isPressed(GLFW_KEY_RIGHT))
-		camera.rotateOy(-cameraSpeed);
-	if (window.isPressed(GLFW_KEY_UP))
-		camera.rotateOx(cameraSpeed);
-	if (window.isPressed(GLFW_KEY_DOWN))
-		camera.rotateOx(-cameraSpeed);*/
 }
 
 

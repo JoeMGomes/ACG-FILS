@@ -32,9 +32,6 @@ void Skybox::setup()
 
 void Skybox::draw()
 {
-
-	// Draws the cubemap as the last object so we can save a bit of performance by discarding all fragments
-	// where an object is present (a depth of 1.0f will always fail against any object's depth value)
 	glBindVertexArray(vao);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
