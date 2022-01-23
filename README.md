@@ -70,7 +70,7 @@ y = vHeight * eastRatio * maxHeight
 
 ### **Normals**
 
-To calculate the normals of the mountain we did the following:  
+To calculate the normals of the mountain the following was done:  
 
 * For each square of the mesh calculate the average normal:
 
@@ -85,7 +85,7 @@ To calculate the normals of the mountain we did the following:
 
 Each vertex normal add the cross product of: **(AB, BC)**,**(BC, CD)**, **(CD, DA)** and **(DA, AB)** 
 
-When you finish iterating through all the faces, normalize each normal.
+After iterating through all the faces, normalize each normal.
 
 ### **Shader**
 
@@ -93,9 +93,7 @@ The mountain shader colors the mountain in various steps.
 
 The default color (**resultTex**) is calculated using noise.
 
-Then we have three different colorings each one with its own limit: **snow**, **grass**, **sand**, **water**. For example, only the vertices that are above a certain **y** and have the normal with a certain inclination are painted with white. 
-
-
+Then we have three different colorings each one with its own limit: **snow**, **grass**, **sand**, **water**. For example, only the vertices that are above a certain **y-value** and have the normal with a certain inclination are painted with white for the snow effect. 
 
 ## **OceanTile**
 
