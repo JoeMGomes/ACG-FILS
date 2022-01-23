@@ -54,9 +54,60 @@ For this panel the **Counter** class was created. It consists of a static intege
  *Note*: The floor is a different case of the collision detection so it is done seperately from other collisions but still uses AABB. 
 ## Movement
 To enable the *FPS Mode* the **Camera** class was expanded to allow FPS-like movement. This movement ignores the camera's pitch and moves the player only in the horizontal plane.
-## Terrain and Waves
+## Terrain Chunk
 
-**TODO**
+### **Height**
+
+The mountain is a terrain chunk that contains an **n** x **n** mesh. The height of each vertex in the Mesh is calculated with the followig formula:
+
+```
+y = vHeight * eastRatio * maxHeight
+```
+
+* **vHeight** is a noise value generated with a fractal brownian noise algorithm provided by the library [**SimplexNoise**](https://github.com/SRombauts/SimplexNoise). This noise value interval is **[-1,1]** but **vHeight** is normalized to **[0,1]**.
+* **eastRatio** is a ratio resulting from a smoothstep. The purpose of this ratio is to create a smooth trasition in the terrain from the mountains to the beach;
+* **maxHeight** is the maximum value that a vertex can have.
+
+### **Normals**
+
+To calculate the normals of the mountain we did the following:  
+
+* For each square of the mesh calculate the average normal:
+
+```
+  A -- D   
+  |   /|
+  |  / | 
+  | /  |
+  |/   |
+  B -- C
+```
+
+Each vertex normal add the cross product of: **(AB, BC)**,**(BC, CD)**, **(CD, DA)** and **(DA, AB)** 
+
+When you finish iterating through all the faces, normalize each normal.
+
+### **Shader**
+
+The mountain shader colors the mountain in various steps.
+
+The default color (**resultTex**) is calculated using noise.
+
+Then we have three different colorings each one with its own limit: **snow**, **grass**, **sand**, **water**. For example, only the vertices that are above a certain **y** and have the normal with a certain inclination are painted with white. 
+
+
+
+## **OceanTile**
+
+### **Mesh**
+
+The algorithm for generating the mesh is similar to the terrainChunk but with every **y** is a 0.
+
+### **Gerstner Waves**
+
+For simulating the waves we use the a vertex shader given the complexity of the algorithm. We tried to implement the **Gerstner **Waves**** with [this](https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-1-effective-water-simulation-physical-models) suggested approach.
+
+However the normal calculation in the shader may have some errors.
 
 
 ## Animations
