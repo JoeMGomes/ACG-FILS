@@ -1,5 +1,5 @@
 # Advanced Computer Graphics - Big Homework 2
- This project was developed durind the Advanced Computer Graphics course at Universitatea Politehnică din București.
+ This project was developed during the Advanced Computer Graphics course at Universitatea Politehnică din București.
 
  The aim of the project was to develop upon the given "game engine" base project adding more functionality and OpenGL features such as collisions, animation, terrain, skyboxes and dynamic water waves.
   ![Screenshots](/readmepics/batch.jpg)
